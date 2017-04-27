@@ -10,16 +10,16 @@
         <!--解决移动设备的适配问题
         -->
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
-       
+
 		<title></title>
 		<style type="text/css">
 			#index,#bus {
 				font-family: "微软雅黑";
 			}
 		</style>
-		
+
 		 <link rel="stylesheet" type="text/css" href="jquery.mobile.flatui.css" />
-		
+
 	</head>
 	<body>
 		<div data-role="page" id="index">
@@ -38,9 +38,9 @@
 					</ul>
 					<br>
 					<table id="table" class="ui-responsive  table-stroke" data-role="table">
-						
+
 					</table>
-					
+
 				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
@@ -62,7 +62,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div data-role="page" id="bus">
 			<div data-role="header" data-position="fixed">
 				<h1>公交查询</h1>
@@ -81,7 +81,7 @@
 					<ul id="resultBus" data-role="listview" data-inset="true">
 					</ul>
 					<br>
-					
+
 				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
@@ -119,7 +119,7 @@
 					<ul id="resultOrderTraces" data-role="listview" data-inset="true">
 					</ul>
 					<br>
-					
+
 				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
@@ -160,7 +160,7 @@
 					<ul id="resultCET" data-role="listview" data-inset="true">
 					</ul>
 					<br>
-					
+
 				</div>
 			</div>
 			<div data-role="footer" data-position="fixed">
@@ -186,7 +186,6 @@
 		<!-- JavaScript 放置在文档最后面可以使页面加载速度更快 -->
 		<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-		<script src="md5.js"></script>
 		<script type="text/javascript">
 			//服务端获取ip 上线使用
 			var client_ip = '223.167.1.41';
@@ -351,12 +350,12 @@
 					var $res = '<li><h1>' + data.result.data.realtime.city_name + ' ' + data.result.data.pubdate + ' ' + data.result.data.pubtime + '刷新</h1></li>' +
 						'<li>天气  ' + data.result.data.realtime.weather.info + '</li>' +
 						'<li>气温  ' + data.result.data.realtime.weather.temperature + '℃</li>' +
-						'<li>湿度  ' + data.result.data.realtime.weather.humidity + 'RH</li>' + 
+						'<li>湿度  ' + data.result.data.realtime.weather.humidity + 'RH</li>' +
 						'<li>风向  ' + data.result.data.realtime.wind.direct + ' ' + data.result.data.realtime.wind.power + '</li>' +
 						'<li><h3>PM2.5</h3></li>' +
 						'<li>指数  ' + data.result.data.pm25.pm25.pm25 + '  级别  ' + data.result.data.pm25.pm25.level + '  ' + data.result.data.pm25.pm25.quality + '</li>' +
 						'<li>详情  ' + data.result.data.pm25.pm25.des + '</li>';
-					
+
 					var $tbl = '<thead>' +
 							'<tr>'+
 								'<th data-priority="6">星期</th>'+
@@ -369,9 +368,9 @@
 					//遍历一个JsonArray
 					$(data.result.data.weather).each(function (index, obj) {
                         $tbl +='<tr>' +
-                        	'<td>周'+obj.week+'</td>' + 
+                        	'<td>周'+obj.week+'</td>' +
                         	'<td>'+obj.info.day[1]+'</td>'+
-                        	'<td>'+obj.info.day[2]+'℃</td>' + 
+                        	'<td>'+obj.info.day[2]+'℃</td>' +
                         	'<td>'+obj.info.day[3]+'</td>' +
                         	'<td>'+obj.info.day[4]+'</td>'+
                         	'<tr/>';
@@ -405,12 +404,12 @@
 						sid = data.sid;
     				}
 				}).done( function() {
-    				$.post('http://shanghaicity.openservice.kankanews.com/public/bus/mes/sid/' + sid, 
+    				$.post('http://shanghaicity.openservice.kankanews.com/public/bus/mes/sid/' + sid,
     				function(response) {
     					returnHtml = response;
     				});
     			});
-    			
+
     			/*
     			$.ajax({
         			type:'POST',
@@ -418,9 +417,9 @@
         			data:{ stoptype:0,stopid:2.,sid:"1fee54ae0a655028a71acfc1bd8aeec9" },
         			success: function(response){
 						var dataall = JSON.parse(response);
- 
+
 					var data = dataall[0];
- 
+
 					if(typeof(data)=="undefined"){
 						mes = '等待发车';
 					}
@@ -435,7 +434,7 @@
 						mes = '等待发车';
 					}else{
 					var tx = data.time;
- 
+
 					if(tx.indexOf("分钟")>0){
 						mes = data.terminal+' 还有'+data.stopdis+'站, 约'+data.time;
 					}else{
@@ -468,7 +467,33 @@
 
 			//快递查询
 			function getOrderTraces(orderCode) {
+				//隐藏小菊花
+				$.mobile.loading("hide");
+				var $list = $('#resultOrderTraces');
+				$list.html('');
+				var $res = '';
+					$.getJSON("http://localhost/webapp/OrderTraces.php", {logisticCode:orderCode}, function(data, status) {
+						//解析JSON
+						//var Traces = JSON.parse(data);
 
+						//eval() 函数使用的是 JavaScript 编译器，可解析 JSON 文本，然后生成 JavaScript 对象。必须把文本包围在括号中，这样才能避免语法错误
+						var MultiTraces = eval ("(" + data + ")");
+
+						for(var SingleTrace in MultiTraces) {
+							if(MultiTraces[SingleTrace].Success === true)
+								for(var Traces in MultiTraces[SingleTrace].Traces) {
+									res += '<li>ShipperCode : '+ShipperCode+'</li>';
+									Traces.forEach(function (value) {
+										value.Traces.forEach(function (trace) {
+											res += '<li>'+trace.AcceptTime+' : '+trace.AcceptStation;
+										})
+									});
+									res += '################################################';
+								}
+						};
+						$list.append($res).listview("refresh");
+						$list.before(returnHtml);
+					});
 			}
 
 			//CET查询
@@ -477,7 +502,7 @@
 			}
 
 		</script>
-		
+
 	</body>
 
 </html>
