@@ -14,6 +14,9 @@ defined('ReqURL') or define('ReqURL', 'http://api.kdniao.cc/Ebusiness/EbusinessO
 //从前端获取快递单号
 $logisticCode = $_GET["logisticCode"];
 
+//*********************DEBUG--先定一个暂时的订单号************************
+//$logisticCode = "1000745320654";
+
 $logisticShippersResult = getOrderShippersByJson($logisticCode);
 
 //***********解析JSON, 并且得到几种可能的ShipperCodes(按照大数据排序的)***********//
@@ -21,6 +24,7 @@ $ShippersArr = json_decode($logisticShippersResult, true);
 //var_dump($ShippersArr);
 //echo $ShippersArr["Shippers"] . "\n";
 
+//解析到的快递个数
 $index = 0;
 
 //创建创建一个空的数组
@@ -30,24 +34,45 @@ $ShipperNames = array();
 foreach ($ShippersArr["Shippers"] as $Shipper) {
     // code...
     //echo "快递" . $index . " : " . $Shipper["ShipperName"] . "\n";
-	$ShipperNames[$index] = $Shipper["ShipperName"];
+    $ShipperNames[$index] = $Shipper["ShipperName"];
     $ShipperCodes[$index++] = $Shipper["ShipperCode"];
 }
 
 
-
+//DEBUG...
 //var_dump($ShipperCodes);
+//var_dump($ShipperNames);
+//DEBUG...
+//echo ("ShipperCodes结束" . "\n");
 
-$ResultTracesJsons = ‘[’;
+
+$ResultTracesJsons = "{";
 $count = 0;
 
+//DEBUG...
+//echo "count = " . $count  . "\n";
+//echo "index = " . $index . "\n";
+
 //************将所有的可能性按照顺序得到OrderTraces, 并把这些Traces组合成一个数组构成的JSON*****************//
-foreach ($ShipperCodes as $ShipperCode)	{
-	$ResultTracesJsons . getOrderTracesByJson($ShipperCode, $LogisticCode) . ',';
+for($i = 0; $i < $index; $i++ ) {
+    $ResultTracesJsons .=  ( '"' . ($i + 1) . '":'  . getOrderTracesByJson($ShipperCodes[$i],  $logisticCode) . ',' );
 }
 
-//去掉最后那多出来的逗号&加上一个]
-echo substr_replace($ResultTracesJsons, '', -1 , 1) . ']';
+//去掉最后那多出来的逗号&加上一个}
+$ResultTracesJsons = substr_replace($ResultTracesJsons, '', -1 , 1)  . '}';
+echo $ResultTracesJsons;
+
+//DEBUG... 显示所有的Shippers的轨迹
+//$ArrayResults = json_decode($ResultTracesJsons , true);
+//echo "\n" .  'ArrayResults[1]["Traces"] : ' . "\n";
+//var_dump($ArrayResults[1]["Traces"]);
+//for($i = 0; $i < $index; $i++) {
+//    echo "第" . ($i + 1) . "个物流信息：" . $ShipperNames[$i]  . "\n";
+//    foreach ($ArrayResults[$i + 1]["Traces"] as $Traces ) {
+//        # code...
+//        echo "时间 ： "  .  $Traces["AcceptTime"] . "\n" . "状态  ：" . $Traces["AcceptStation"] . "\n";
+//    }
+//}
 
 //-------------------------------------------------------------
 
@@ -55,40 +80,40 @@ echo substr_replace($ResultTracesJsons, '', -1 , 1) . ']';
  * Json方式 单号识别
  */
 function getOrderShippersByJson($Code){
-	//$requestData= "{'LogisticCode':'1000745320654'}";
-	$requestData = "{'LogisticCode':'" . $Code . "'}";
-	$datas = array(
+    //$requestData= "{'LogisticCode':'1000745320654'}";
+    $requestData = "{'LogisticCode':'" . $Code . "'}";
+    $datas = array(
         'EBusinessID' => EBusinessID,
         'RequestType' => '2002',
         'RequestData' => urlencode($requestData) ,
         'DataType' => '2',
     );
     $datas['DataSign'] = encrypt($requestData, AppKey);
-	$result=sendOrderPost(ReqURL, $datas);
+    $result=sendOrderPost(ReqURL, $datas);
 
-	//根据公司业务处理返回的信息......
+    //根据公司业务处理返回的信息......
 
-	return $result;
+    return $result;
 }
 /**
  * Json方式 查询订单物流轨迹
  */
 function getOrderTracesByJson($ShippCode, $LogisCode){
-	//$requestData= "{'OrderCode':'','ShipperCode':'YTO','LogisticCode':'12345678'}";
-	$requestData = "{'OrderCode':'','ShipperCode':'" . $ShippCode . "','LogisticCode':'" . $LogisCode . "'}";
+    //$requestData= "{'OrderCode':'','ShipperCode':'YTO','LogisticCode':'12345678'}";
+    $requestData = "{'OrderCode':'','ShipperCode':'" . $ShippCode . "','LogisticCode':'" . $LogisCode . "'}";
 
-	$datas = array(
+    $datas = array(
         'EBusinessID' => EBusinessID,
         'RequestType' => '1002',
         'RequestData' => urlencode($requestData) ,
         'DataType' => '2',
     );
     $datas['DataSign'] = encrypt($requestData, AppKey);
-	$result=sendShipperPost(ReqURL, $datas);
+    $result=sendShipperPost(ReqURL, $datas);
 
-	//根据公司业务处理返回的信息......
+    //根据公司业务处理返回的信息......
 
-	return $result;
+    return $result;
 }
 
 /**
@@ -104,10 +129,10 @@ function sendOrderPost($url, $datas) {
     }
     $post_data = implode('&', $temps);
     $url_info = parse_url($url);
-	if(empty($url_info['port']))
-	{
-		$url_info['port']=80;
-	}
+    if(empty($url_info['port']))
+    {
+        $url_info['port']=80;
+    }
     $httpheader = "POST " . $url_info['path'] . " HTTP/1.0\r\n";
     $httpheader.= "Host:" . $url_info['host'] . "\r\n";
     $httpheader.= "Content-Type:application/x-www-form-urlencoded\r\n";
@@ -117,14 +142,14 @@ function sendOrderPost($url, $datas) {
     $fd = fsockopen($url_info['host'], $url_info['port']);
     fwrite($fd, $httpheader);
     $gets = "";
-	$headerFlag = true;
-	while (!feof($fd)) {
-		if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
-			break;
-		}
-	}
+    $headerFlag = true;
     while (!feof($fd)) {
-		$gets.= fread($fd, 128);
+        if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
+            break;
+        }
+    }
+    while (!feof($fd)) {
+        $gets.= fread($fd, 128);
     }
     fclose($fd);
 
@@ -145,10 +170,10 @@ function sendShipperPost($url, $datas) {
     }
     $post_data = implode('&', $temps);
     $url_info = parse_url($url);
-	if(empty($url_info['port']))
-	{
-		$url_info['port']=80;
-	}
+    if(empty($url_info['port']))
+    {
+        $url_info['port']=80;
+    }
     $httpheader = "POST " . $url_info['path'] . " HTTP/1.0\r\n";
     $httpheader.= "Host:" . $url_info['host'] . "\r\n";
     $httpheader.= "Content-Type:application/x-www-form-urlencoded\r\n";
@@ -158,14 +183,14 @@ function sendShipperPost($url, $datas) {
     $fd = fsockopen($url_info['host'], $url_info['port']);
     fwrite($fd, $httpheader);
     $gets = "";
-	$headerFlag = true;
-	while (!feof($fd)) {
-		if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
-			break;
-		}
-	}
+    $headerFlag = true;
     while (!feof($fd)) {
-		$gets.= fread($fd, 128);
+        if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
+            break;
+        }
+    }
+    while (!feof($fd)) {
+        $gets.= fread($fd, 128);
     }
     fclose($fd);
 
