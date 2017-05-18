@@ -419,6 +419,7 @@
 				var mes = '当前到站: null';
 				var returnHtml = '';
 
+			/*
     			$.ajax({
     				url: 'http://shanghaicity.openservice.kankanews.com/public/bus/get',
     				type: 'post',
@@ -436,6 +437,7 @@
     					returnHtml = response;
     				});
     			});
+    			*/
 
     			/*
     			$.ajax({
