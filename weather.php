@@ -469,7 +469,7 @@
 			function getOrderTraces(orderCode) {
 				var $list = $('#resultOrderTraces');
 				$list.html('');
-				var res = '';
+				var $res = '';
 				$.getJSON("OrderTraces.php", {logisticCode:orderCode}, function(data, status) {
 					//隐藏小菊花
 					$.mobile.loading("hide");
@@ -483,16 +483,16 @@
 
 					//遍历这个JsonArray
 					for(var index in data) {
-						res += '<li><h1>快递公司 : '+data[index]["ShipperCode"]+'</h1></li>';
+						$res += '<li><h1>快递公司 : '+data[index]["ShipperCode"]+'</h1></li>';
 						if(data[index]["State"] != '0') {
 							data[index]["Traces"].forEach(function(Site) {
-								res += '<li>' + Site.AcceptTime + "</li><li>"+ Site.AcceptStation + '</li>';
-									res += "<li></li>";
+								$res += '<li>' + Site.AcceptTime + "</li><li>"+ Site.AcceptStation + '</li>';
+									$res += "<li></li>";
     								});
 							} else {
-								res += '<li><h2>' + data[index]["Reason"] + '</h2></li>';
+								$res += '<li><h2>' + data[index]["Reason"] + '</h2></li>';
 							}
-							res += '<li>################################################</li>';
+							$res += '<li>################################################</li>';
 						}
 
 						
