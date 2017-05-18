@@ -385,14 +385,14 @@
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
-					for(var index in data.result.future) {
+					$(data.result.future).each( function(index, obj) {
 						$tbl +='<tr>' +
-                        				'<td>'+data.result.future[index]date + ' ' + data.result.future[index]week+'</td>' +
-                        				'<td>'+data.result.future[index]weather+'</td>'+
-                        				'<td>'+data.result.future[index]temperature+'</td>' +
-                        				'<td>'+data.result.future[index]wind+'</td>' +
+                        				'<td>'+obj.date + ' ' + obj.week+'</td>' +
+                        				'<td>'+obj.weather+'</td>'+
+                        				'<td>'+obj.temperature+'</td>' +
+                        				'<td>'+obj.wind+'</td>' +
                         				'<tr/>';
-					}
+					});
                     				$tbl+='</tbody>';
                     				
                     				//填充数据并刷新样式
