@@ -467,12 +467,12 @@
 
 			//快递查询
 			function getOrderTraces(orderCode) {
-				//隐藏小菊花
-				$.mobile.loading("hide");
 				var $list = $('#resultOrderTraces');
 				$list.html('');
 				var $res = '';
 					$.getJSON("OrderTraces.php", {logisticCode:orderCode}, function(data, status) {
+						//隐藏小菊花
+						$.mobile.loading("hide");
 						//解析JSON
 						//var Traces = JSON.parse(data);
 
@@ -488,7 +488,7 @@
 									res += "<li></li>";
     								});
 							} else {
-								res += '<li><h2>Null</h2></li>';
+								res += '<li><h2>' + TracesArray[index]["Reason"] + '</h2></li>';
 							}
 							res += '<li>################################################</li>';
 						}
