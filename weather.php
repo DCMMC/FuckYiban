@@ -472,25 +472,28 @@
 				var $list = $('#resultOrderTraces');
 				$list.html('');
 				var $res = '';
-					$.getJSON("http://localhost/webapp/OrderTraces.php", {logisticCode:orderCode}, function(data, status) {
+					$.getJSON("OrderTraces.php", {logisticCode:orderCode}, function(data, status) {
 						//解析JSON
 						//var Traces = JSON.parse(data);
 
-						//eval() 函数使用的是 JavaScript 编译器，可解析 JSON 文本，然后生成 JavaScript 对象。必须把文本包围在括号中，这样才能避免语法错误
-						var MultiTraces = eval ("(" + data + ")");
+						//将Json转化为Array
+						var TracesArray = JSON.parse(data);
 
-						for(var SingleTrace in MultiTraces) {
-							if(MultiTraces[SingleTrace].Success === true)
-								for(var Traces in MultiTraces[SingleTrace].Traces) {
-									res += '<li>ShipperCode : '+ShipperCode+'</li>';
-									Traces.forEach(function (value) {
-										value.Traces.forEach(function (trace) {
-											res += '<li>'+trace.AcceptTime+' : '+trace.AcceptStation;
-										})
-									});
-									res += '################################################';
-								}
-						};
+						//遍历这个JsonArray
+						for(var index in TracesArray) {
+							res += '<li><h1>快递公司 : '+TracesArray[index]["ShipperCode"]+'</h1></li>';
+							if(TracesArray[index]["State"] != '0') {
+								ArrObj[index]["Traces"].forEach(function(Site) {
+									res += '<li>' + Site.AcceptTime + "</li><li>"+ Site.AcceptStation + '</li>';
+									res += "<li></li>";
+    								});
+							} else {
+								res += '<li><h2>Null</h2></li>';
+							}
+							res += '<li>################################################</li>';
+						}
+
+						
 						$list.append($res).listview("refresh");
 						$list.before(returnHtml);
 					});
