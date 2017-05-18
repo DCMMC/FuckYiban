@@ -477,18 +477,20 @@
 						//var Traces = JSON.parse(data);
 
 						//将Json转化为Array
-						var TracesArray = JSON.parse(data);
+						//var TracesArray = JSON.parse(data);
+						//修复Uncaught SyntaxError: Unexpected token o in JSON 
+						//Your data is already an object. No need to parse it. The javascript interpreter has already parsed it for you.
 
 						//遍历这个JsonArray
-						for(var index in TracesArray) {
-							res += '<li><h1>快递公司 : '+TracesArray[index]["ShipperCode"]+'</h1></li>';
-							if(TracesArray[index]["State"] != '0') {
+						for(var index in data) {
+							res += '<li><h1>快递公司 : '+data[index]["ShipperCode"]+'</h1></li>';
+							if(data[index]["State"] != '0') {
 								ArrObj[index]["Traces"].forEach(function(Site) {
 									res += '<li>' + Site.AcceptTime + "</li><li>"+ Site.AcceptStation + '</li>';
 									res += "<li></li>";
     								});
 							} else {
-								res += '<li><h2>' + TracesArray[index]["Reason"] + '</h2></li>';
+								res += '<li><h2>' + data[index]["Reason"] + '</h2></li>';
 							}
 							res += '<li>################################################</li>';
 						}
