@@ -366,13 +366,13 @@
 					//拼接我们所需要的信息
 					var $res = '<li><h1>' + data.result.today.city + ' ' + data.result.today.date_y + data.result.sk.time + ' ' + '</h1></li>' +
 						'<li>实时湿度  ' + data.result.sk.humidity + '</li>' +
-						'<li>实时风向 ' + data.result.sk.wind_direction + ' ' + data.result.sk.wind_strength +
-						'<li>实时气温 ' + data.result.sk.temp + '</li>' +
+						'<li>实时风向  ' + data.result.sk.wind_direction + ' ' + data.result.sk.wind_strength +
+						'<li>实时气温  ' + data.result.sk.temp + '</li>' +
 						'<li>今日天气  ' + data.result.today.weather + '</li>' +
 						'<li>今日气温  ' + data.result.today.temperature + '℃</li>' +
 						'<li>今日风向  ' + data.result.today.wind + '</li>' +
-						'<li>UV指数  ' + data.result.today.uv_index  + '</li>' + 
-						'<li>穿衣建议 ' + data.result.today.dressing_advice + '</li>';
+						'<li>UV指数    ' + data.result.today.uv_index  + '</li>' + 
+						'<li>穿衣建议  ' + data.result.today.dressing_advice + '</li>';
 
 
 					var $tbl = '<thead>' +
@@ -385,14 +385,14 @@
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
-					$(data.result.future).each(function (index, obj) {
-                        				$tbl +='<tr>' +
-                        				'<td>'+obj.date + ' ' + obj.week+'</td>' +
-                        				'<td>'+obj.weather+'</td>'+
-                        				'<td>'+obj.temperature+'</td>' +
-                        				'<td>'+obj.wind+'</td>' +
+					for(var index in data.result.future) {
+						$tbl +='<tr>' +
+                        				'<td>'+data.result.future.index.date + ' ' + obj.week+'</td>' +
+                        				'<td>'+data.result.future.index.weather+'</td>'+
+                        				'<td>'+data.result.future.index.temperature+'</td>' +
+                        				'<td>'+data.result.future.index.wind+'</td>' +
                         				'<tr/>';
-                    				});
+					}
                     				$tbl+='</tbody>';
                     				
                     				//填充数据并刷新样式
