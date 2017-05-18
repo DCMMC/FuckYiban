@@ -193,7 +193,7 @@
 			//var client_ip = '59.172.105.58';
 			//cors跨域代理  了解详情 -> http://blog.csdn.net/xiaoping0915/article/details/57557206
 			//跨域代理已经失效
-			var cors_url = 'http://proxy.e12e.com/?';
+			//var cors_url = 'http://proxy.e12e.com/?';
 
 			var client_ip = "<?php
 			function getIp(){
@@ -474,7 +474,7 @@
 
 				$list.html('');
 				//异步调用查询公交信息接口
-				$.getJSON(cors_url + bus_url + cName + '&bus=' + roadNum,function(data, status){
+				$.getJSON("juheBus.php", {cName:cName, roadNum:roadNum} ,function(data, status){
 					//隐藏小菊花
 					$.mobile.loading("hide");
 					if(data.error_code != 0) {
