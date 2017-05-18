@@ -188,15 +188,32 @@
 		<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 		<script type="text/javascript">
 			//服务端获取ip 上线使用
-			var client_ip = '223.167.1.41';
+			//var client_ip = '223.167.1.41';
 			//前端测试使用 上线屏蔽
 			//var client_ip = '59.172.105.58';
 			//cors跨域代理  了解详情 -> http://blog.csdn.net/xiaoping0915/article/details/57557206
+			//跨域代理已经失效
 			var cors_url = 'http://proxy.e12e.com/?';
-			//获取ip接口
-			var ip_url = 'http://ip.taobao.com/service/getIpInfo.php?ip=';
-			//天气信息接口
-			var m_url = 'http://op.juhe.cn/onebox/weather/query?key=3611a1e75f91ff1544fc9f84ec489021&dtype=json&cityname=';
+
+			var client_ip = "<?php
+			function getIp(){
+   				if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown"))
+       					$ip = getenv("HTTP_CLIENT_IP");
+   				else if (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown"))
+       					$ip = getenv("HTTP_X_FORWARDED_FOR");
+  				else if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
+       					$ip = getenv("REMOTE_ADDR");
+  				else if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
+           					$ip = $_SERVER['REMOTE_ADDR'];
+       				else
+           					$ip = "unknown";
+       				return($ip);
+			}
+
+            
+			echo getIp();
+			?>";
+
 			//公交信息接口
 			var bus_url = 'http://op.juhe.cn/189/bus/busline?dtype=&key=1198ca7b9b559f7536b5b824c7fae885&city=';
 			//客户所在城市
@@ -205,7 +222,7 @@
 			var kuaidi_url = '39f4b145382a4e29b7c3c3e44af1ed92';
 			//在index页面创建前去请求接口拿数据
 			$(document).on("pagebeforecreate","#index", function() {
-				$.getJSON(cors_url + ip_url + client_ip, function(data, status) {
+				$.getJSON("getCity.php", function(data, status) {
 					//异步调用ip接口获取城市信息
 					client_city = data.data.city;
 					$('#keyword').val(data.data.city);
@@ -337,46 +354,48 @@
 				var $table = $('#table');
 				$table.html('');
 				//异步调用查询天气接口
-				$.getJSON(cors_url + m_url + cityName, function(data, status) {
+				$.getJSON("juheWeather.php", {city:cityName}, function(data, status) {
 					//回调后让加载的小菊花隐藏起来
 					$.mobile.loading("hide");
 					//JSON对象的操作方式就是 使用 .  的方式链式寻找
-					if(data.error_code != 0) {
+					if(data.resultcode != 200) {
 						//如果返回数据中error_code 不等于 0 则说明调用接口不成功没有得到目标城市的天气信息
 						alert(data.reason);
 						return;
 					}
 					//拼接我们所需要的信息
-					var $res = '<li><h1>' + data.result.data.realtime.city_name + ' ' + data.result.data.pubdate + ' ' + data.result.data.pubtime + '刷新</h1></li>' +
-						'<li>天气  ' + data.result.data.realtime.weather.info + '</li>' +
-						'<li>气温  ' + data.result.data.realtime.weather.temperature + '℃</li>' +
-						'<li>湿度  ' + data.result.data.realtime.weather.humidity + 'RH</li>' +
-						'<li>风向  ' + data.result.data.realtime.wind.direct + ' ' + data.result.data.realtime.wind.power + '</li>' +
-						'<li><h3>PM2.5</h3></li>' +
-						'<li>指数  ' + data.result.data.pm25.pm25.pm25 + '  级别  ' + data.result.data.pm25.pm25.level + '  ' + data.result.data.pm25.pm25.quality + '</li>' +
-						'<li>详情  ' + data.result.data.pm25.pm25.des + '</li>';
+					var $res = '<li><h1>' + data.result.today.city + ' ' + data.result.today.date_y + data.result.sk.time + ' ' + '</h1></li>' +
+						'<li>实时湿度  ' + data.result.sk.humidity + '</li>' +
+						'<li>实时风向 ' + data.result.sk.wind_direction + ' ' + data.result.sk.wind_strength +
+						'<li>实时气温 ' + data.result.sk.temp + '</li>' +
+						'<li>今日天气  ' + data.result.today.weather + '</li>' +
+						'<li>今日气温  ' + data.result.today.temperature + '℃</li>' +
+						'<li>今日风向  ' + data.result.today.wind + '</li>' +
+						'<li>UV指数  ' + data.result.today.uv_index  + '</li>' + 
+						'<li>穿衣建议 ' + data.result.today.dressing_advice + '</li>' +
+
 
 					var $tbl = '<thead>' +
 							'<tr>'+
-								'<th data-priority="6">星期</th>'+
+								'<th data-priority="6">日期</th>'+
 								'<th>天气</th>'+
-								'<th data-priority="1">均温</th>'+
+								'<th data-priority="1">温度范围</th>'+
 								'<th data-priority="2">风向</th>'+
 								'<th data-priority="3">风级</th>'+
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
-					$(data.result.data.weather).each(function (index, obj) {
-                        $tbl +='<tr>' +
-                        	'<td>周'+obj.week+'</td>' +
-                        	'<td>'+obj.info.day[1]+'</td>'+
-                        	'<td>'+obj.info.day[2]+'℃</td>' +
-                        	'<td>'+obj.info.day[3]+'</td>' +
-                        	'<td>'+obj.info.day[4]+'</td>'+
-                        	'<tr/>';
-                    });
-                    $tbl+='</tbody>';
-                    //填充数据并刷新样式
+					$(data.result.future).each(function (index, obj) {
+                        				$tbl +='<tr>' +
+                        				'<td>'+obj.date + ' ' + obj.week+'</td>' +
+                        				'<td>'+obj.weather+'</td>'+
+                        				'<td>'+obj.temperature+'</td>' +
+                        				'<td>'+obj.wind+'</td>' +
+                        				'<tr/>';
+                    				});ßß
+                    				$tbl+='</tbody>';
+                    				
+                    				//填充数据并刷新样式
 					$list.append($res).listview("refresh");
 					$table.append($tbl).table('refresh');
 				});
@@ -495,9 +514,8 @@
 							$res += '<li>################################################</li>';
 						}
 
-						
+					//填充数据并刷新样式
 					$list.append($res).listview("refresh");
-					$list.before(returnHtml);
 					});
 			}
 
