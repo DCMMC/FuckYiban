@@ -372,7 +372,7 @@
 						'<li>今日气温  ' + data.result.today.temperature + '℃</li>' +
 						'<li>今日风向  ' + data.result.today.wind + '</li>' +
 						'<li>UV指数  ' + data.result.today.uv_index  + '</li>' + 
-						'<li>穿衣建议 ' + data.result.today.dressing_advice + '</li>' +
+						'<li>穿衣建议 ' + data.result.today.dressing_advice + '</li>';
 
 
 					var $tbl = '<thead>' +
