@@ -215,7 +215,7 @@
 			?>";
 
 			//前端测试使用 上线屏蔽
-			client_ip = '59.172.105.58';
+			client_ip = '223.167.1.41';
 
 			//公交信息接口
 			var bus_url = 'http://op.juhe.cn/189/bus/busline?dtype=&key=1198ca7b9b559f7536b5b824c7fae885&city=';
@@ -360,6 +360,10 @@
 				$.getJSON("juheWeather.php", {city:cityName}, function(data, status) {
 					//回调后让加载的小菊花隐藏起来
 					$.mobile.loading("hide");
+
+					//DEBUG...
+					alert(cityName);
+					
 					//JSON对象的操作方式就是 使用 .  的方式链式寻找
 					if(data.resultcode != "200") {
 						//如果返回数据中error_code 不等于 200 则说明调用接口不成功没有得到目标城市的天气信息
