@@ -377,11 +377,10 @@
 
 					var $tbl = '<thead>' +
 							'<tr>'+
-								'<th data-priority="6">日期</th>'+
-								'<th>天气</th>'+
+								'<th data-priority="5">日期</th>'+
+								'<th data-priority="3">天气</th>'+
 								'<th data-priority="1">温度范围</th>'+
 								'<th data-priority="2">风向</th>'+
-								'<th data-priority="3">风级</th>'+
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
