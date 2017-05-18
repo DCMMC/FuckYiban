@@ -358,7 +358,7 @@
 					//回调后让加载的小菊花隐藏起来
 					$.mobile.loading("hide");
 					//JSON对象的操作方式就是 使用 .  的方式链式寻找
-					if(data.resultcode != 200) {
+					if(data.resultcode != "200") {
 						//如果返回数据中error_code 不等于 0 则说明调用接口不成功没有得到目标城市的天气信息
 						alert(data.reason);
 						return;
@@ -392,7 +392,7 @@
                         				'<td>'+obj.temperature+'</td>' +
                         				'<td>'+obj.wind+'</td>' +
                         				'<tr/>';
-                    				});ßß
+                    				});
                     				$tbl+='</tbody>';
                     				
                     				//填充数据并刷新样式
