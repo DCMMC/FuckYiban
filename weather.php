@@ -490,7 +490,7 @@
 						$res += '<li> 第' + obj.stationNum + '站： '  + obj.name + '</li>';
 					});
 					$list.append($res).listview("refresh");
-					$list.before(returnHtml);
+					//$list.before(returnHtml);
 				});
 			}
 
@@ -530,8 +530,32 @@
 			}
 
 			//CET查询
-			function getCET(ID, name) {
+			function getCET(ticket, name) {
+				var $list = $('#resultCET');
+				$list.html('');
+				var $res = '';
+				$.getJSON("cet.php", {name:name, ticket:ticket}, function(data, status) {
+					//隐藏小菊花
+					$.mobile.loading("hide");
+					if(data.status == true) {
+						$res += '<li><h2>姓名 ' + data.name + '</li>' +
+						'<li>学校 ' + data.school + '</li>' +
+						'<li>类型 ' + data.type + '</li>' +
+						'<li>考试时间 ' + data.examTime + '</li>' +
+						'<li><h1>分数 ' + data.score + '<li>' +
+						'<li>听力 ' + data.listening + '</li>' + 
+						'<li>阅读 ' + data.reading + '</li>' + 
+						'<li>写作' + data.writing + '</li>' ;
+						if(data.spokenTestid != '"--"') {
+							$res += '<li><h2>口试成绩 ' + data.spokenGrade + '</li>';
+						}
+					} else {
+						$res += '<li>无法找到对应的分数</li><li>请确认你输入的准考证号及姓名无误</li>';
+					}
 
+					//填充数据并刷新样式
+					$list.append($res).listview("refresh");
+					});
 			}
 
 		</script>
