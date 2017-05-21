@@ -2,11 +2,6 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<!--
-        	作者：@xiaoping  http://blog.csdn.net/xiaoping0915
-        	时间：2017-02-27
-        	描述：提供天气查询和公交信息查询的便民服务
-        -->
         <!--解决移动设备的适配问题
         -->
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
@@ -217,12 +212,9 @@
 			//前端测试使用 上线屏蔽
 			//client_ip = '223.167.1.41';
 
-			//公交信息接口
-			var bus_url = 'http://op.juhe.cn/189/bus/busline?dtype=&key=1198ca7b9b559f7536b5b824c7fae885&city=';
 			//客户所在城市
 			var client_city ;
-			//快递查询api
-			var kuaidi_url = '39f4b145382a4e29b7c3c3e44af1ed92';
+			
 			//在index页面创建前去请求接口拿数据
 			$(document).on("pagebeforecreate","#index", function() {
 				$.getJSON("getCity.php", {ip:client_ip}, function(data, status) {
@@ -324,7 +316,7 @@
 			$(document).on('pageinit','#english',function() {
 				function sCET() {
 					var $ID = $('#cetID').val();
-					var $name = $('#cetID').val();
+					var $name = $('#name').val();
 					//var $
 					var $tipID = $('#tipID');
 					var $tipName = $('#tipName');
@@ -339,7 +331,7 @@
 					$tipName.fadeOut();
 					$.mobile.loading("show");
 					//查询CET成绩
-					getCET(ID, name);
+					getCET($ID, $name);
 				}
 				//绑定按钮点击和回车键按下的事件
 				$('#btnSearchCET').on('click', function() {
@@ -381,7 +373,7 @@
 						'<li>今日气温  ' + data.result.today.temperature + '℃</li>' +
 						'<li>今日风向  ' + data.result.today.wind + '</li>' +
 						'<li>UV指数    ' + data.result.today.uv_index  + '</li>' + 
-						'<li>穿衣建议  ' + data.result.today.dressing_advice + '</li>';
+						'<p>穿衣建议  ' + data.result.today.dressing_advice + '</p>';
 
 
 					var $tbl = '<thead>' +
@@ -393,14 +385,14 @@
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
-					$(data.result.future).each( function(index, obj) {
-						$tbl +='<tr>' +
-                        				'<td>'+obj.date + ' ' + obj.week+'</td>' +
-                        				'<td>'+obj.weather+'</td>'+
-                        				'<td>'+obj.temperature+'</td>' +
-                        				'<td>'+obj.wind+'</td>' +
+                    				for(var index in data.result.future) {
+                    					$tbl +='<tr>' +
+                        				'<td>'+data.result.future[index].date + ' ' + data.result.future[index].week+'</td>' +
+                        				'<td>'+data.result.future[index]+'</td>'+
+                        				'<td>'+data.result.future[index].temperature+'</td>' +
+                        				'<td>'+data.result.future[index].wind+'</td>' +
                         				'<tr/>';
-					});
+                    				}
                     				$tbl+='</tbody>';
                     				
                     				//填充数据并刷新样式
@@ -412,12 +404,13 @@
 			function getCityBus(cName,roadNum){
 				//拿到list元素并清空
 				var $list = $('#resultBus');
-
+				$list.html('');
+				
 				//DCMMC
 				//get Sid
-				var sid;
-				var mes = '当前到站: null';
-				var returnHtml = '';
+				//var sid;
+				//var mes = '当前到站: null';
+				//var returnHtml = '';
 
 			/*
     			$.ajax({
@@ -474,7 +467,6 @@
     			});
     			*/
 
-				$list.html('');
 				//异步调用查询公交信息接口
 				$.getJSON("juheBus.php", {cName:cName, roadNum:roadNum} ,function(data, status){
 					//隐藏小菊花
@@ -483,15 +475,27 @@
 						alert(data.reason);
 						return;
 					}
-					//获得需要的数据并填充
-					var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1><h2>' + mes + '</h2></li>';
-					//var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
-					$(data.result[0].stationdes).each(function (index, obj) {
-						$res += '<li> 第' + obj.stationNum + '站： '  + obj.name + '</li>';
-					});
-					$list.append($res).listview("refresh");
-					//$list.before(returnHtml);
+
+					//上海的话就可以用实时公交
+					if( cName.indexOf("上海") >= 0 ) {
+						var beforeNode = document.getElementById("btnSearchBus");
+						var busLink = "http://61.129.57.81:8181/showBusData.aspx?line=" + data.result[0].key_name;
+						$("<iframe " + "' id='Frame1'" + ' src = "' + busLink + '" ' + "name='Frame1' style='height:100%;visibility:inherit; width:100%;z-index:1;'  frameborder='0' allowTransparency='true'></iframe>").insertAfter(beforeNode);    
+					} else {
+						//获得需要的数据并填充
+						var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
+						//var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
+						$(data.result[0].stationdes).each(function (index, obj) {
+							$res += '<li> 第' + obj.stationNum + '站： '  + obj.name + '</li>';
+						});
+						$list.append($res).listview("refresh");
+						//$list.before(returnHtml);
+					}
+					
 				});
+
+				
+ 
 			}
 
 			//快递查询
@@ -515,7 +519,7 @@
 						$res += '<li><h1>快递公司 : '+data[index]["ShipperCode"]+'</h1></li>';
 						if(data[index]["State"] != '0') {
 							data[index]["Traces"].forEach(function(Site) {
-								$res += '<li>' + Site.AcceptTime + "</li><li>"+ Site.AcceptStation + '</li>';
+								$res += '<li>' + Site.AcceptTime + "</li><p>"+ Site.AcceptStation + '</p>';
 									$res += "<li></li>";
     								});
 							} else {
@@ -538,16 +542,16 @@
 					//隐藏小菊花
 					$.mobile.loading("hide");
 					if(data.status == true) {
-						$res += '<li><h2>姓名 ' + data.name + '</li>' +
+						$res += '<li><h2>姓名 ' + data.name + '</h2></li>' +
 						'<li>学校 ' + data.school + '</li>' +
 						'<li>类型 ' + data.type + '</li>' +
 						'<li>考试时间 ' + data.examTime + '</li>' +
-						'<li><h1>分数 ' + data.score + '<li>' +
+						'<li><h1>分数 ' + data.score + '</h1><li>' +
 						'<li>听力 ' + data.listening + '</li>' + 
 						'<li>阅读 ' + data.reading + '</li>' + 
 						'<li>写作' + data.writing + '</li>' ;
 						if(data.spokenTestid != '"--"') {
-							$res += '<li><h2>口试成绩 ' + data.spokenGrade + '</li>';
+							$res += '<li><h1>口试成绩 ' + data.spokenGrade + '</li>';
 						}
 					} else {
 						$res += '<li>无法找到对应的分数</li><li>请确认你输入的准考证号及姓名无误</li>';
