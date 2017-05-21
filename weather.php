@@ -382,15 +382,17 @@
 								'<th data-priority="3">天气</th>'+
 								'<th data-priority="1">温度范围</th>'+
 								'<th data-priority="2">风向</th>'+
+								'<th data-priority="5">    </th>' +
 							'</tr>'+
 						'</thead><tbody>' ;
 					//遍历一个JsonArray
                     				for(var index in data.result.future) {
                     					$tbl +='<tr>' +
                         				'<td>'+data.result.future[index].date + ' ' + data.result.future[index].week+'</td>' +
-                        				'<td>'+data.result.future[index]+'</td>'+
+                        				'<td>'+data.result.future[index].weather+'</td>'+
                         				'<td>'+data.result.future[index].temperature+'</td>' +
                         				'<td>'+data.result.future[index].wind+'</td>' +
+                        				'<td>      </td>' +
                         				'<tr/>';
                     				}
                     				$tbl+='</tbody>';
@@ -405,7 +407,7 @@
 				//拿到list元素并清空
 				var $list = $('#resultBus');
 				$list.html('');
-				
+
 				//DCMMC
 				//get Sid
 				//var sid;
@@ -478,12 +480,17 @@
 
 					//上海的话就可以用实时公交
 					if( cName.indexOf("上海") >= 0 ) {
+						//先判断是否已经有了Frame1这个id的Frame，有的话就remove
+                                                		$("#Frame1").remove();
 						var beforeNode = document.getElementById("btnSearchBus");
-						var busLink = "http://61.129.57.81:8181/showBusData.aspx?line=" + data.result[0].key_name;
-						$("<iframe " + "' id='Frame1'" + ' src = "' + busLink + '" ' + "name='Frame1' style='height:100%;visibility:inherit; width:100%;z-index:1;'  frameborder='0' allowTransparency='true'></iframe>").insertAfter(beforeNode);    
+						//什么垃圾系统 还要不符合标准的把Unicode字符在URI中表示为: %uxxxx
+						var busLink = "http://61.129.57.81:8181/showBusData.aspx?line=" + escape(data.result[0].key_name);
+						$("<iframe " + "' id='Frame1'" + ' src = "' + busLink + '" '  + "name='Frame1' style='height:100%;visibility:inherit; width:100%;z-index:1;'  frameborder='0' allowTransparency='true'></iframe>").insertAfter(beforeNode);  
+
+
 					} else {
 						//获得需要的数据并填充
-						var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
+						var $res = '<li><h1>' + data.result[0].key_name + '  '+ data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
 						//var $res = '<li><h1>' + data.result[0].key_name + data.result[0].terminal_name + '~' + data.result[0].front_name + '</h1></li>';
 						$(data.result[0].stationdes).each(function (index, obj) {
 							$res += '<li> 第' + obj.stationNum + '站： '  + obj.name + '</li>';
